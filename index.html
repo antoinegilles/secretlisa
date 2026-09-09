@@ -147,7 +147,9 @@
     padding: 16px 26px;
     box-shadow: 0 10px 25px rgba(255,77,136,0.4);
     transition: left 0.35s cubic-bezier(.68,-0.55,.27,1.55), top 0.35s cubic-bezier(.68,-0.55,.27,1.55);
-    white-space: nowrap;
+    text-align: center;
+    line-height: 1.25;
+    max-width: calc(100% - 20px);   /* ne déborde jamais de l'arène */
   }
 
   /* ---------- ÉTAPE 2 : jauge d'amour ---------- */
@@ -234,10 +236,41 @@
 
   .hidden { display: none !important; }
 
+  /* ---------- Responsive ---------- */
+  @media (max-width: 600px) {
+    .stage { padding: 16px; }
+    .card { padding: 32px 20px; }
+    h1 { font-size: 40px; }
+  }
   @media (max-width: 480px) {
-    h1 { font-size: 38px; }
-    .card { padding: 30px 18px; }
-    #heartBtn { font-size: 76px; }
+    h1 { font-size: 34px; }
+    h2 { font-size: 30px; }
+    p.lead { font-size: 15px; margin-bottom: 22px; }
+    .card { padding: 28px 16px; }
+    #arena { height: 260px; }
+    #loveBtn { font-size: 15px; padding: 14px 20px; }
+    #heartBtn { font-size: 72px; }
+    #meterPct { font-size: 20px; }
+    #bigBday { font-size: 30px; }
+    #finale .love { font-size: 17px; }
+    .ticket .tbody { padding: 16px; }
+    .route .code { font-size: 26px; }
+    .tgrid { gap: 12px 18px; }
+    .barcode { height: 38px; }
+  }
+  @media (max-width: 360px) {
+    h1 { font-size: 30px; }
+    h2 { font-size: 26px; }
+    #loveBtn { font-size: 14px; padding: 12px 16px; }
+    #heartBtn { font-size: 64px; }
+    .route .code { font-size: 23px; }
+    #bigBday { font-size: 26px; }
+  }
+
+  /* Écrans courts (paysage sur mobile) : on réduit l'arène pour éviter le scroll */
+  @media (max-height: 560px) {
+    #arena { height: 190px; }
+    #heartBtn { font-size: 60px; }
   }
 </style>
 </head>
