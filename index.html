@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Une surprise pour toi ❤️</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ==========================================================================
+     ❤️  À PERSONNALISER FACILEMENT  ❤️
+     Change juste les valeurs dans le bloc CONFIG en bas du fichier (dans <script>)
+     ========================================================================== */
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --rose: #ff4d88;
+    --rose-clair: #ff8fb3;
+    --violet: #7b2ff7;
+    --creme: #fff6fa;
+    --or: #ffcf5c;
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ffd7e8 0%, #ffe9f3 40%, #f3e7ff 100%);
+    color: #3a2140;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Cœurs flottants en fond */
+  .bg-hearts { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .bg-hearts span {
+    position: absolute;
+    bottom: -40px;
+    font-size: 22px;
+    opacity: 0.35;
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.4; }
+    100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+  }
+
+  .stage {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 640px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .step { display: none; animation: pop 0.5s ease; }
+  .step.active { display: block; }
+  @keyframes pop {
+    0%   { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .card {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(8px);
+    border-radius: 28px;
+    padding: 40px 28px;
+    box-shadow: 0 20px 60px rgba(255,77,136,0.25);
+    border: 2px solid rgba(255,255,255,0.6);
+  }
+
+  .kicker {
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--rose);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 46px;
+    line-height: 1.1;
+    color: var(--violet);
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 38px;
+    color: var(--rose);
+    margin-bottom: 14px;
+  }
+
+  p.lead { font-size: 17px; font-weight: 300; margin-bottom: 26px; }
+
+  .progress-dots {
+    display: flex; gap: 10px; justify-content: center; margin-bottom: 26px;
+  }
+  .dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: rgba(123,47,247,0.2); transition: all 0.3s;
+  }
+  .dot.on { background: var(--rose); transform: scale(1.3); box-shadow: 0 0 12px var(--rose-clair); }
+
+  button {
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    border: none;
+    border-radius: 40px;
+    font-weight: 600;
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--rose) 0%, var(--violet) 100%);
+    color: white;
+    font-size: 18px;
+    padding: 16px 30px;
+    box-shadow: 0 10px 25px rgba(255,77,136,0.4);
+  }
+  .btn-primary:hover { transform: translateY(-2px) scale(1.03); }
+  .btn-primary:active { transform: scale(0.97); }
+
+  /* ---------- ÉTAPE 1 : bouton fuyard ---------- */
+  #arena {
+    position: relative;
+    height: 240px;
+    margin-top: 10px;
+  }
+  #loveBtn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, var(--rose) 0%, var(--violet) 100%);
+    color: white;
+    font-size: 17px;
+    padding: 16px 26px;
+    box-shadow: 0 10px 25px rgba(255,77,136,0.4);
+    transition: left 0.35s cubic-bezier(.68,-0.55,.27,1.55), top 0.35s cubic-bezier(.68,-0.55,.27,1.55);
+    white-space: nowrap;
+  }
+
+  /* ---------- ÉTAPE 2 : jauge d'amour ---------- */
+  .meter-wrap {
+    background: rgba(255,255,255,0.7);
+    border-radius: 40px;
+    height: 34px;
+    overflow: hidden;
+    margin: 14px 0 8px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.1);
+  }
+  #meterFill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--rose-clair), var(--rose), var(--violet));
+    border-radius: 40px;
+    transition: width 0.25s ease;
+  }
+  #meterPct { font-weight: 700; font-size: 22px; color: var(--violet); margin-bottom: 8px; }
+  #meterMsg { min-height: 26px; font-weight: 600; color: var(--rose); margin-bottom: 22px; }
+  #heartBtn {
+    background: none; font-size: 90px; line-height: 1;
+    filter: drop-shadow(0 8px 16px rgba(255,77,136,0.5));
+    user-select: none;
+  }
+  #heartBtn:active { transform: scale(0.82); }
+
+  /* ---------- ÉTAPE 3 : carte à gratter ---------- */
+  .scratch-hint { font-size: 15px; color: var(--violet); margin-bottom: 14px; font-weight: 600; }
+  .scratch-holder {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 18px 45px rgba(123,47,247,0.35);
+  }
+  #scratchCanvas {
+    position: absolute; inset: 0; z-index: 3;
+    width: 100%; height: 100%;
+    cursor: grab; touch-action: none; border-radius: 22px;
+  }
+
+  /* Le billet d'avion (dessous la couche à gratter) */
+  .ticket {
+    position: relative;
+    background: #fff;
+    text-align: left;
+    border-radius: 22px;
+  }
+  .ticket .tstub {
+    background: linear-gradient(135deg, var(--rose) 0%, var(--violet) 100%);
+    color: #fff;
+    padding: 16px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .ticket .tstub .brand { font-weight: 700; letter-spacing: 1px; font-size: 15px; }
+  .ticket .tstub .plane { font-size: 26px; }
+  .ticket .tbody { padding: 20px; }
+  .route { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .route .city { text-align: center; }
+  .route .code { font-size: 30px; font-weight: 700; color: var(--violet); line-height: 1; }
+  .route .name { font-size: 12px; color: #7a6a80; }
+  .route .mid { flex: 1; text-align: center; color: var(--rose); font-size: 20px; }
+  .route .mid .dur { display: block; font-size: 11px; color: #7a6a80; }
+  .tgrid { display: flex; flex-wrap: wrap; gap: 14px 26px; margin: 16px 0 6px; }
+  .tgrid .f .l { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #9a8aa0; }
+  .tgrid .f .v { font-size: 15px; font-weight: 600; color: #3a2140; }
+  .barcode { display: flex; gap: 2px; height: 44px; margin-top: 14px; }
+  .barcode i { display: block; background: #2a1730; height: 100%; }
+
+  /* ---------- Écran final ---------- */
+  #finale { display: none; text-align: center; margin-top: 26px; }
+  #finale.show { display: block; animation: pop 0.6s ease; }
+  #bigBday {
+    font-family: 'Dancing Script', cursive;
+    font-size: 40px;
+    color: var(--rose);
+    margin: 10px 0;
+    line-height: 1.15;
+  }
+  #finale .love { font-size: 20px; font-weight: 600; color: var(--violet); }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 38px; }
+    .card { padding: 30px 18px; }
+    #heartBtn { font-size: 76px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="bg-hearts" id="bgHearts"></div>
+
+  <div class="stage">
+
+    <div class="progress-dots" id="dots">
+      <div class="dot on"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+
+    <!-- ================= ÉTAPE 1 ================= -->
+    <section class="step active" id="step1">
+      <div class="card">
+        <div class="kicker">Étape 1 / 3</div>
+        <h1>Prouve-moi ton amour</h1>
+        <p class="lead">C'est tout simple : appuie sur le bouton. Enfin... si tu y arrives 😏</p>
+        <div id="arena">
+          <button id="loveBtn" class="btn-primary">Clique pour prouver ton amour ❤️</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ÉTAPE 2 ================= -->
+    <section class="step" id="step2">
+      <div class="card">
+        <div class="kicker">Étape 2 / 3</div>
+        <h2>Remplis mon cœur d'amour</h2>
+        <p class="lead">Appuie sur le cœur encore et encore jusqu'à 100%. Fort. Comme tu m'aimes. 💗</p>
+        <div id="meterPct">0%</div>
+        <div class="meter-wrap"><div id="meterFill"></div></div>
+        <div id="meterMsg">Allez, montre-moi ce que tu ressens...</div>
+        <button id="heartBtn" aria-label="Appuie sur le cœur">💗</button>
+      </div>
+    </section>
+
+    <!-- ================= ÉTAPE 3 ================= -->
+    <section class="step" id="step3">
+      <div class="card">
+        <div class="kicker">Étape 3 / 3</div>
+        <h2>Ton cadeau est caché ici</h2>
+        <p class="scratch-hint">👆 Gratte la carte avec ton doigt (ou la souris) pour découvrir...</p>
+
+        <div class="scratch-holder" id="scratchHolder">
+          <!-- Le billet, révélé en grattant -->
+          <div class="ticket" id="ticket">
+            <div class="tstub">
+              <span class="brand">✈ AMOUR AIRLINES</span>
+              <span class="plane">🛫</span>
+            </div>
+            <div class="tbody">
+              <div class="route">
+                <div class="city">
+                  <div class="code" id="fromCode">PAR</div>
+                  <div class="name" id="fromName">Paris</div>
+                </div>
+                <div class="mid">✈<span class="dur" id="dur">vol de l'amour</span></div>
+                <div class="city">
+                  <div class="code" id="toCode">PDL</div>
+                  <div class="name" id="toName">Açores</div>
+                </div>
+              </div>
+              <div class="tgrid">
+                <div class="f"><div class="l">Passagère</div><div class="v" id="pax">Mon Amour</div></div>
+                <div class="f"><div class="l">Date</div><div class="v" id="date">à venir</div></div>
+                <div class="f"><div class="l">Siège</div><div class="v" id="seat">1A · Câlins</div></div>
+                <div class="f"><div class="l">Classe</div><div class="v" id="cls">Première Bisous</div></div>
+              </div>
+              <div class="barcode" id="barcode"></div>
+            </div>
+          </div>
+          <!-- La couche grise à gratter (dessinée dans le canvas) -->
+          <canvas id="scratchCanvas"></canvas>
+        </div>
+
+        <!-- Message final après grattage -->
+        <div id="finale">
+          <div id="bigBday">Joyeux 30ᵉ anniversaire<br>mon amour 🎂✨</div>
+          <p class="love">On s'envole aux Açores tous les deux 🌋🌊<br>Je t'aime plus que tout ❤️</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+<script>
+/* =========================================================================
+   ❤️  CONFIG — modifie ces valeurs pour personnaliser le billet et le mot
+   ========================================================================= */
+const CONFIG = {
+  prenom:      "Lisa",          // le prénom de ta copine
+  age:         30,
+  fromCode:    "CDG",           // aéroport de départ (code)
+  fromName:    "Paris",
+  toCode:      "PDL",           // Ponta Delgada, Açores
+  toName:      "Açores",
+  duree:       "un rêve à deux",// ou "3h05" par ex.
+  date:        "Bientôt ✨",    // ex: "12 juin 2026"
+  siege:       "1A · Câlins",
+  classe:      "Première Bisous",
+};
+
+/* ---- injecte la config dans le billet ---- */
+document.getElementById('fromCode').textContent = CONFIG.fromCode;
+document.getElementById('fromName').textContent = CONFIG.fromName;
+document.getElementById('toCode').textContent   = CONFIG.toCode;
+document.getElementById('toName').textContent   = CONFIG.toName;
+document.getElementById('dur').textContent      = CONFIG.duree;
+document.getElementById('pax').textContent      = CONFIG.prenom;
+document.getElementById('date').textContent     = CONFIG.date;
+document.getElementById('seat').textContent     = CONFIG.siege;
+document.getElementById('cls').textContent      = CONFIG.classe;
+document.getElementById('bigBday').innerHTML     =
+  `Joyeux ${CONFIG.age}ᵉ anniversaire<br>${CONFIG.prenom} 🎂✨`;
+
+/* ---- code-barres décoratif ---- */
+(function () {
+  const bc = document.getElementById('barcode');
+  let html = '';
+  for (let i = 0; i < 48; i++) {
+    const w = Math.random() > 0.5 ? 4 : 2;
+    html += `<i style="width:${w}px;opacity:${0.55 + Math.random()*0.45}"></i>`;
+  }
+  bc.innerHTML = html;
+})();
+
+/* ---- cœurs flottants en fond ---- */
+(function () {
+  const box = document.getElementById('bgHearts');
+  const emojis = ['❤️','💕','💖','💗','💓','🩷'];
+  for (let i = 0; i < 22; i++) {
+    const s = document.createElement('span');
+    s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    s.style.left = Math.random()*100 + 'vw';
+    s.style.fontSize = (16 + Math.random()*26) + 'px';
+    s.style.animationDuration = (9 + Math.random()*10) + 's';
+    s.style.animationDelay = (Math.random()*12) + 's';
+    box.appendChild(s);
+  }
+})();
+
+/* ---- navigation entre étapes ---- */
+const steps = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3')];
+const dots  = document.querySelectorAll('#dots .dot');
+let current = 0;
+
+function goTo(index) {
+  steps[current].classList.remove('active');
+  current = index;
+  steps[current].classList.add('active');
+  dots.forEach((d, i) => d.classList.toggle('on', i <= current));
+  if (current === 2) setTimeout(initScratch, 100); // le canvas a besoin d'être visible
+}
+
+/* =========================================================================
+   ÉTAPE 1 — le bouton fuyard
+   ========================================================================= */
+const loveBtn = document.getElementById('loveBtn');
+const arena = document.getElementById('arena');
+const btnTexts = [
+  "Tu ne m'aimes pas assez, continue 🙄",
+  "Sérieux ?! Encore un effort 😤",
+  "Bon d'accord... presque ! Insiste 🥹",
+];
+let loveClicks = 0;
+
+loveBtn.addEventListener('click', () => {
+  loveClicks++;
+  if (loveClicks >= 4) {
+    goTo(1);
+    return;
+  }
+  // change le texte
+  loveBtn.textContent = btnTexts[loveClicks - 1];
+  // déplace le bouton à une position aléatoire dans l'arène
+  const pad = 20;
+  const maxX = arena.clientWidth  - loveBtn.offsetWidth  - pad;
+  const maxY = arena.clientHeight - loveBtn.offsetHeight - pad;
+  const x = pad + Math.random() * Math.max(0, maxX - pad);
+  const y = pad + Math.random() * Math.max(0, maxY - pad);
+  loveBtn.style.left = x + 'px';
+  loveBtn.style.top  = y + 'px';
+  loveBtn.style.transform = 'none';
+});
+
+/* =========================================================================
+   ÉTAPE 2 — la jauge d'amour
+   ========================================================================= */
+const heartBtn = document.getElementById('heartBtn');
+const meterFill = document.getElementById('meterFill');
+const meterPct  = document.getElementById('meterPct');
+const meterMsg  = document.getElementById('meterMsg');
+let love = 0;
+let done2 = false;
+
+const msgs = [
+  { at: 0,  txt: "Allez, montre-moi ce que tu ressens..." },
+  { at: 20, txt: "Oh c'est mignon, mais je te connais, tu m'aimes plus 🥰" },
+  { at: 40, txt: "Je le sens ! Continue, mon cœur chauffe 💓" },
+  { at: 60, txt: "Ouiii ! Encore, encore, n'abandonne pas 🔥" },
+  { at: 80, txt: "PRESQUE !!! Mon cœur va exploser 💥" },
+  { at: 95, txt: "Un tout dernier petit clic d'amour... 🥹" },
+];
+
+function currentMsg(v) {
+  let m = msgs[0].txt;
+  for (const item of msgs) if (v >= item.at) m = item.txt;
+  return m;
+}
+
+heartBtn.addEventListener('click', () => {
+  if (done2) return;
+  // monte plus lentement vers la fin (pour rigoler)
+  const step = love < 70 ? (7 + Math.random()*6) : (3 + Math.random()*3);
+  love = Math.min(100, love + step);
+  meterFill.style.width = love + '%';
+  meterPct.textContent = Math.round(love) + '%';
+  meterMsg.textContent = currentMsg(love);
+
+  // petit rebond du cœur
+  heartBtn.style.transform = 'scale(1.18)';
+  setTimeout(() => heartBtn.style.transform = 'scale(1)', 90);
+
+  if (love >= 100) {
+    done2 = true;
+    meterPct.textContent = "100% ❤️";
+    meterMsg.textContent = "Amour officiellement confirmé ✅ On passe à la surprise...";
+    burstHearts(heartBtn);
+    setTimeout(() => goTo(2), 1200);
+  }
+});
+
+/* =========================================================================
+   ÉTAPE 3 — la carte à gratter
+   ========================================================================= */
+let scratchReady = false;
+let revealed = false;
+
+function initScratch() {
+  if (scratchReady) return;
+  scratchReady = true;
+
+  const holder = document.getElementById('scratchHolder');
+  const ticket = document.getElementById('ticket');
+  const canvas = document.getElementById('scratchCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // le holder prend la taille du billet
+  const rect = ticket.getBoundingClientRect();
+  const w = Math.round(rect.width);
+  const h = Math.round(rect.height);
+  holder.style.height = h + 'px';
+
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = w * dpr;
+  canvas.height = h * dpr;
+  canvas.style.width  = w + 'px';
+  canvas.style.height = h + 'px';
+  ctx.scale(dpr, dpr);
+
+  // couche à gratter : dégradé + texte
+  const grad = ctx.createLinearGradient(0, 0, w, h);
+  grad.addColorStop(0, '#c9a6ff');
+  grad.addColorStop(1, '#ff9ec4');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.font = "600 20px Poppins, sans-serif";
+  ctx.textAlign = 'center';
+  ctx.fillText('✨ GRATTE-MOI ✨', w/2, h/2 - 10);
+  ctx.font = "400 14px Poppins, sans-serif";
+  ctx.fillText('ta surprise est dessous...', w/2, h/2 + 16);
+
+  ctx.globalCompositeOperation = 'destination-out';
+
+  let drawing = false;
+
+  function pos(e) {
+    const r = canvas.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    return { x: p.clientX - r.left, y: p.clientY - r.top };
+  }
+  function scratch(e) {
+    if (!drawing) return;
+    const { x, y } = pos(e);
+    ctx.beginPath();
+    ctx.arc(x, y, 24, 0, Math.PI*2);
+    ctx.fill();
+    e.preventDefault();
+  }
+  function start(e) { drawing = true; scratch(e); }
+  function stop() { drawing = false; checkReveal(); }
+
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', scratch);
+  window.addEventListener('mouseup', stop);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove', scratch, { passive: false });
+  canvas.addEventListener('touchend', stop);
+
+  function checkReveal() {
+    if (revealed) return;
+    // échantillonne les pixels pour mesurer le % gratté
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let clear = 0;
+    const totalSamples = Math.floor(img.length / 4 / 40);
+    for (let i = 0; i < img.length; i += 4 * 40) {
+      if (img[i + 3] === 0) clear++;
+    }
+    if (clear / totalSamples > 0.5) revealTicket(canvas);
+  }
+}
+
+function revealTicket(canvas) {
+  if (revealed) return;
+  revealed = true;
+  // efface toute la couche en douceur
+  canvas.style.transition = 'opacity 0.6s ease';
+  canvas.style.opacity = '0';
+  setTimeout(() => canvas.remove(), 650);
+
+  document.getElementById('finale').classList.add('show');
+  dots.forEach(d => d.classList.add('on'));
+
+  // pluie de cœurs + confettis
+  heartRain(3500);
+  confetti();
+}
+
+/* =========================================================================
+   Effets festifs
+   ========================================================================= */
+function burstHearts(fromEl) {
+  const r = fromEl.getBoundingClientRect();
+  const cx = r.left + r.width/2;
+  const cy = r.top + r.height/2;
+  const emojis = ['❤️','💖','💕','💗','✨'];
+  for (let i = 0; i < 14; i++) {
+    const el = document.createElement('div');
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.cssText = `position:fixed;left:${cx}px;top:${cy}px;font-size:${18+Math.random()*18}px;
+      pointer-events:none;z-index:9999;transition:transform 0.9s ease-out,opacity 0.9s ease-out;`;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => {
+      const ang = Math.random()*Math.PI*2;
+      const dist = 60 + Math.random()*120;
+      el.style.transform = `translate(${Math.cos(ang)*dist}px, ${Math.sin(ang)*dist - 40}px) scale(1.4)`;
+      el.style.opacity = '0';
+    });
+    setTimeout(() => el.remove(), 950);
+  }
+}
+
+function heartRain(duration) {
+  const emojis = ['❤️','💕','💖','💗','💓','🩷','🎉','✨'];
+  const end = Date.now() + duration;
+  const timer = setInterval(() => {
+    if (Date.now() > end) { clearInterval(timer); return; }
+    const el = document.createElement('div');
+    el.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    const size = 18 + Math.random()*26;
+    el.style.cssText = `position:fixed;left:${Math.random()*100}vw;top:-40px;font-size:${size}px;
+      pointer-events:none;z-index:9999;transition:transform linear;`;
+    document.body.appendChild(el);
+    const fall = 3000 + Math.random()*2500;
+    el.style.transitionDuration = fall + 'ms';
+    requestAnimationFrame(() => {
+      el.style.transform = `translateY(110vh) rotate(${(Math.random()*720-360)}deg)`;
+    });
+    setTimeout(() => el.remove(), fall + 100);
+  }, 120);
+}
+
+function confetti() {
+  const colors = ['#ff4d88','#7b2ff7','#ffcf5c','#ff8fb3','#4dd2ff'];
+  for (let i = 0; i < 90; i++) {
+    const c = document.createElement('div');
+    const size = 6 + Math.random()*8;
+    c.style.cssText = `position:fixed;left:${Math.random()*100}vw;top:-20px;
+      width:${size}px;height:${size*0.6}px;background:${colors[Math.floor(Math.random()*colors.length)]};
+      pointer-events:none;z-index:9998;border-radius:2px;opacity:0.9;
+      transition:transform ${2500+Math.random()*2000}ms ease-in, opacity 0.5s ease ${2500}ms;`;
+    document.body.appendChild(c);
+    requestAnimationFrame(() => {
+      c.style.transform = `translate(${(Math.random()*200-100)}px, 110vh) rotate(${Math.random()*720}deg)`;
+      c.style.opacity = '0';
+    });
+    setTimeout(() => c.remove(), 5000);
+  }
+}
+</script>
+</body>
+</html>
