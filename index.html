@@ -133,7 +133,7 @@
   /* ---------- ÉTAPE 1 : bouton fuyard ---------- */
   #arena {
     position: relative;
-    height: 240px;
+    height: 320px;
     margin-top: 10px;
   }
   #loveBtn {
@@ -146,7 +146,7 @@
     font-size: 17px;
     padding: 16px 26px;
     box-shadow: 0 10px 25px rgba(255,77,136,0.4);
-    transition: left 0.35s cubic-bezier(.68,-0.55,.27,1.55), top 0.35s cubic-bezier(.68,-0.55,.27,1.55);
+    transition: left 0.4s cubic-bezier(.68,-0.55,.27,1.55), top 0.4s cubic-bezier(.68,-0.55,.27,1.55), transform 0.55s ease-in-out;
     text-align: center;
     line-height: 1.25;
     max-width: calc(100% - 20px);   /* ne déborde jamais de l'arène */
@@ -247,7 +247,7 @@
     h2 { font-size: 30px; }
     p.lead { font-size: 15px; margin-bottom: 22px; }
     .card { padding: 28px 16px; }
-    #arena { height: 260px; }
+    #arena { height: 300px; }
     #loveBtn { font-size: 15px; padding: 14px 20px; }
     #heartBtn { font-size: 72px; }
     #meterPct { font-size: 20px; }
@@ -269,7 +269,7 @@
 
   /* Écrans courts (paysage sur mobile) : on réduit l'arène pour éviter le scroll */
   @media (max-height: 560px) {
-    #arena { height: 190px; }
+    #arena { height: 210px; }
     #heartBtn { font-size: 60px; }
   }
 </style>
@@ -437,27 +437,40 @@ const arena = document.getElementById('arena');
 const btnTexts = [
   "Tu ne m'aimes pas assez, continue 🙄",
   "Sérieux ?! Encore un effort 😤",
-  "Bon d'accord... presque ! Insiste 🥹",
+  "Nan mais insiste, j'y crois pas 😤",
+  "Ah non non, j'ai bougé exprès 😜",
+  "Tu me fais tourner la tête 🌀",
+  "Bon d'accord... dernier clic, promis 🥹",
 ];
+const TOTAL_CLICKS = 7;          // 6 esquives + le clic qui valide
 let loveClicks = 0;
+let loveRot = 0;                 // rotation cumulée du bouton
+let lastFx = 0.5, lastFy = 0.5;  // dernière position (en fraction de l'arène)
 
 loveBtn.addEventListener('click', () => {
   loveClicks++;
-  if (loveClicks >= 4) {
+  if (loveClicks >= TOTAL_CLICKS) {
     goTo(1);
     return;
   }
   // change le texte
   loveBtn.textContent = btnTexts[loveClicks - 1];
-  // déplace le bouton à une position aléatoire dans l'arène
-  const pad = 20;
-  const maxX = arena.clientWidth  - loveBtn.offsetWidth  - pad;
-  const maxY = arena.clientHeight - loveBtn.offsetHeight - pad;
-  const x = pad + Math.random() * Math.max(0, maxX - pad);
-  const y = pad + Math.random() * Math.max(0, maxY - pad);
-  loveBtn.style.left = x + 'px';
-  loveBtn.style.top  = y + 'px';
-  loveBtn.style.transform = 'none';
+
+  // rotation aléatoire : 90°, 180° ou 360°, dans un sens aléatoire, cumulée
+  const angle = [90, 180, 360][Math.floor(Math.random() * 3)];
+  loveRot += angle * (Math.random() < 0.5 ? -1 : 1);
+
+  // saut vers le côté OPPOSÉ (pour qu'il se déplace bien plus loin)
+  const pad = 16;
+  const usableX = Math.max(0, arena.clientWidth  - loveBtn.offsetWidth  - pad * 2);
+  const usableY = Math.max(0, arena.clientHeight - loveBtn.offsetHeight - pad * 2);
+  const fx = lastFx < 0.5 ? (0.6 + Math.random() * 0.4) : (Math.random() * 0.4);
+  const fy = lastFy < 0.5 ? (0.6 + Math.random() * 0.4) : (Math.random() * 0.4);
+  lastFx = fx; lastFy = fy;
+
+  loveBtn.style.left = (pad + fx * usableX) + 'px';
+  loveBtn.style.top  = (pad + fy * usableY) + 'px';
+  loveBtn.style.transform = 'rotate(' + loveRot + 'deg)';
 });
 
 /* =========================================================================
