@@ -567,9 +567,72 @@ function revealTicket(canvas) {
   document.getElementById('finale').classList.add('show');
   dots.forEach(d => d.classList.add('on'));
 
+  // 💨 le prout de la révélation (puis les cœurs juste après)
+  playFart();
+
   // pluie de cœurs + confettis
   heartRain(3500);
   confetti();
+}
+
+/* =========================================================================
+   Son de prout 💨 (synthétisé, aucun fichier externe)
+   ========================================================================= */
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) audioCtx = new AC();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+// débloque l'audio dès la première interaction (règle des navigateurs)
+window.addEventListener('pointerdown', () => getAudioCtx(), { once: true });
+
+function playFart() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+
+  // filtre passe-bas pour le côté "boueux"
+  const lp = ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 1000;
+  lp.Q.value = 6;
+  lp.connect(ctx.destination);
+
+  // oscillateur principal (le "braaap")
+  const osc = ctx.createOscillator();
+  osc.type = 'sawtooth';
+  const g = ctx.createGain();
+  osc.connect(g).connect(lp);
+
+  // hauteur : basse, qui tremblote puis retombe
+  osc.frequency.setValueAtTime(115, now);
+  osc.frequency.linearRampToValueAtTime(70,  now + 0.18);
+  osc.frequency.linearRampToValueAtTime(95,  now + 0.32);
+  osc.frequency.linearRampToValueAtTime(50,  now + 0.62);
+
+  // LFO = le flottement caractéristique du prout
+  const lfo = ctx.createOscillator();
+  lfo.type = 'square';
+  lfo.frequency.setValueAtTime(17, now);
+  lfo.frequency.linearRampToValueAtTime(31, now + 0.5);
+  const lfoGain = ctx.createGain();
+  lfoGain.gain.value = 28;
+  lfo.connect(lfoGain).connect(osc.frequency);
+
+  // enveloppe de volume : deux petites bouffées comiques
+  g.gain.setValueAtTime(0.001, now);
+  g.gain.linearRampToValueAtTime(0.9, now + 0.03);
+  g.gain.linearRampToValueAtTime(0.45, now + 0.2);
+  g.gain.linearRampToValueAtTime(0.8, now + 0.29);
+  g.gain.linearRampToValueAtTime(0.2, now + 0.52);
+  g.gain.exponentialRampToValueAtTime(0.001, now + 0.78);
+
+  osc.start(now); lfo.start(now);
+  osc.stop(now + 0.8); lfo.stop(now + 0.8);
 }
 
 /* =========================================================================
